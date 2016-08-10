@@ -1,2 +1,9 @@
+"""
+Toy function to import
+"""
+
 def my_func():
-  print "hello"
+    """
+    Print hello
+    """
+    print "hello"
