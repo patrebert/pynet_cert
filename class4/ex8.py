@@ -1,6 +1,7 @@
 #!/bin/env python
 """
   Demonstrate use of netmiko to change configuration of device
+  using configuration file
 """
 
 from netmiko import ConnectHandler
@@ -19,23 +20,10 @@ pynet2 = {
     'password': '88newclass',
 }
 
-juniper_srx = {
-    'device_type': 'juniper',
-    'ip': '184.105.247.76',
-    'username': 'pyclass',
-    'password': '88newclass',
-    'secret': ''
-}
-
-sess1=ConnectHandler(**pynet2)
-sess1.config_mode()
-print "CONFIG MODE %s" %sess1.check_config_mode()
-
 for device in [pynet1,pynet2]:
     print "\nDEVICE %s" %device['ip']
     sess=ConnectHandler(**device)
-    sess.config_mode()
-    sess.send_config_from_file('config.txt')
+    print sess.config_mode()
+    print sess.send_config_from_file('config.txt')
     print "%s" %sess.send_command('sho run | i logging')
     sess.disconnect()
-    
