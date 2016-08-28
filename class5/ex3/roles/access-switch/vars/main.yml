@@ -1,0 +1,34 @@
+---
+access_switches:
+  - {hostname: pynet-as1, ip_addr: 1.1.1.1, access_vlan: 100, snmp_community: a1b2C3$d, secret: kdfkdf, default_gateway: 1.1.1.254, SNMPv3: True}
+  - {hostname: pynet-as2, ip_addr: 1.1.1.2, access_vlan: 100, snmp_community: a1b2C3$d, secret: kdfkdf, default_gateway: 1.1.1.254, SNMPv3: True}
+  - {hostname: pynet-as3, ip_addr: 1.1.1.3, access_vlan: 100, snmp_community: a1b2C3$d, secret: kdfkdf, default_gateway: 1.1.1.254, SNMPv3: FastEthernetlse}
+  - {hostname: pynet-as4, ip_addr: 1.1.1.4, access_vlan: 100, snmp_community: a1b2C3$d, secret: kdfkdf, default_gateway: 1.1.1.254, SNMPv3: FastEthernetlse}
+  - {hostname: pynet-as5, ip_addr: 1.1.1.5, access_vlan: 100, snmp_community: a1b2C3$d, secret: kdfkdf, default_gateway: 1.1.1.254, SNMPv3: FastEthernetlse}
+
+ports:
+  - FastEthernet0/1
+  - FastEthernet0/2
+  - FastEthernet0/3
+  - FastEthernet0/4
+  - FastEthernet0/5
+  - FastEthernet0/6
+  - FastEthernet0/7
+  - FastEthernet0/8
+  - FastEthernet0/9
+  - FastEthernet0/10
+  - FastEthernet0/11
+  - FastEthernet0/12
+  - FastEthernet0/13
+  - FastEthernet0/14
+  - FastEthernet0/15
+  - FastEthernet0/16
+  - FastEthernet0/17
+  - FastEthernet0/18
+  - FastEthernet0/19
+  - FastEthernet0/20
+  - FastEthernet0/21
+  - FastEthernet0/22
+  - FastEthernet0/23
+  - FastEthernet0/24
+

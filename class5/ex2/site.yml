@@ -1,0 +1,6 @@
+---
+- name: wtf
+  hosts: local
+
+  roles:
+    - access-switch
