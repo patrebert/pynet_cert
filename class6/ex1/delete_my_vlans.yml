@@ -1,0 +1,30 @@
+---
+
+- name: Create Arista Vlans
+  hosts: arista
+
+  tasks:
+    - name: remove vlan666
+      eos_vlan: name=vlan666 vlanid=666 state=absent
+          username={{ eapi_username }}
+          password={{ eapi_password }}
+          host={{ eapi_hostname }}
+          port={{ eapi_port }}
+          transport=https
+
+    - name: remove vlan667
+      eos_vlan: name=vlan667 vlanid=667 state=absent
+          username={{ eapi_username }}
+          password={{ eapi_password }}
+          host={{ eapi_hostname }}
+          port={{ eapi_port }}
+          transport=https
+
+    - name: remove vlan668
+      eos_vlan: name=vlan668 vlanid=668 state=absent
+          username={{ eapi_username }}
+          password={{ eapi_password }}
+          host={{ eapi_hostname }}
+          port={{ eapi_port }}
+          transport=https
+

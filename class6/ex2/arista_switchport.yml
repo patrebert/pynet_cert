@@ -1,0 +1,31 @@
+---
+
+- name: Create Arista Primary Port
+  hosts: arista
+
+  tasks:
+
+    - name: create vlan666
+      eos_vlan: name=vlan666 vlanid=666
+          username={{ eapi_username }}
+          password={{ eapi_password }}
+          host={{ eapi_hostname }}
+          port={{ eapi_port }}
+          transport=https
+
+    - name: set Ethernet3 description
+      eos_interface: name=Ethernet3 description="XXX IN USE XXX"
+          username={{ eapi_username }}
+          password={{ eapi_password }}
+          host={{ eapi_hostname }}
+          port={{ eapi_port }}
+          transport=https
+
+    - name: assign vlan to access port Ethernet3
+      eos_switchport: name=Ethernet3 access_vlan=666 
+          username={{ eapi_username }}
+          password={{ eapi_password }}
+          host={{ eapi_hostname }}
+          port={{ eapi_port }}
+          transport=https
+
