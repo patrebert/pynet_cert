@@ -1,0 +1,12 @@
+---
+
+- name: Set Banner
+  hosts: juniper 
+
+  tasks:
+    - name: Set Banner
+      junos_install_config: file=banner.conf
+          juniper_user=pyclass
+          juniper_password=88newclass
+          port=830
+
