@@ -1,26 +1,25 @@
 #!/usr/bin/env python
-'''
-Challenge exercise (optional) -- Using Arista's eAPI, write an Ansible module
-that adds a VLAN (both a VLAN ID and a VLAN name).  Do this in an idempotent
-manner i.e. only add the VLAN if it doesn't exist; only change the VLAN name
-if it is not correct.
 
-To simplify this process, use the .eapi.conf file to store the connection
-arguments (username, password, host, port, transport).
-'''
+#pynet-sw4 eapi_username=eapi eapi_password=17mendel eapi_hostname=184.105.247.75 eapi_port=443
 
 import sys
 import pyeapi
-from pprint import pprint
+import ssl
+import re
 
-# Reuse functions from class5, exercise2
-from eapi_vlan import check_vlan_exists, configure_vlan
-from ansible.module_utils.basic import *
+def re_in_list(regex,list):
+    for l in list:
+        m = re.match('(%s*)' %regex, l)
+        if m:
+            return l
+    return None
 
 def main():
-    '''
+
+   '''
     Simple Ansible module to create an Arista VLAN
     '''
+
     module = AnsibleModule(
         argument_spec=dict(
             arista_sw=dict(required=True),
@@ -28,29 +27,46 @@ def main():
             vlan_name=dict(required=False),
         )
     )
-    
 
-    vlan_id = module.params['vlan_id']
-    vlan_name = module.params.get('vlan_name')
-    arista_sw = module.params.get('arista_sw')
-    print arista_sw
-#   sys.exit()
+    vlan_string = "vlan %s" %vlan_id
+    name_string = "name %s" %vlan_name
 
-    eapi_conn = pyeapi.connect_to(arista_sw)
 
-    # Check if VLAN already exists
-    check_vlan = check_vlan_exists(eapi_conn, vlan_id)
+    ssl._create_default_https_context = ssl._create_unverified_context
 
-    if check_vlan:
-        if vlan_name is not None and check_vlan != vlan_name:
-            configure_vlan(eapi_conn, vlan_id, vlan_name)
-            module.exit_json(msg="VLAN already exists, setting VLAN name", changed=True)
-        else:
-            module.exit_json(msg="VLAN already exists, no action required", changed=False)
-
+    remote_connect=pyeapi.connect_to("pynet-sw4")
+    response=remote_connect.enable("show running-config")
+    config=response[0]['result']['cmds']
+    if vlan_string in config.keys():
+        is_configured = True
+        vlan_config = config[vlan_string]
     else:
-        configure_vlan(eapi_conn, vlan_id, vlan_name)
-        module.exit_json(msg="Adding VLAN including vlan_name (if present)", changed=True)
+        is_configured = False
+
+    if opcode == '--name':
+        if is_configured:
+            print "vlan %s IS CONFIGURED" %vlan_num
+            print "  NAME IS %s" %name_string
+            if not name_string in vlan_config.keys():
+                print "    BUT NAME IS INCORRECT"
+                print "RECONFIGURE VLAN NAME"
+                commands = [vlan_string,name_string]
+                print "COMMANDS=%s" %commands
+                remote_connect.config(commands)
+        else:
+            print "vlan %s IS NOT CONFIGURED" %vlan_num
+            commands = [vlan_string,name_string]
+            print "COMMANDS=%s" %commands
+            remote_connect.config(commands)
+            print "vlan %s CONFIGURED" %vlan_num
+
+    elif opcode=='--remove':
+        if is_configured:
+             commands = ['no %s' %vlan_string]
+             remote_connect.config(commands)
+             print "vlan %s REMOVED" %vlan_num
+        else:
+            print "vlan %s IS NOT CONFIGURED" %vlan_num
 
 if __name__ == "__main__":
     main()

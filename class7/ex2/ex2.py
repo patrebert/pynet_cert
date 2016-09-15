@@ -3,7 +3,7 @@
 #pynet-sw4 eapi_username=eapi eapi_password=17mendel eapi_hostname=184.105.247.75 eapi_port=443
 
 import sys
-import jsonrpclib
+import pyeapi
 import ssl
 import re
 
@@ -14,64 +14,62 @@ def re_in_list(regex,list):
             return l
     return None
 
+def main():
 
-opcodes = [
-    '--name',
-    '--remove'
-]
+    opcodes = [
+        '--name',
+        '--remove'
+    ]
 
-opcode=sys.argv.pop(1)
-if not opcode in opcodes:
-    print "INVALID OPERATION: USE --name or --remove"
+    opcode=sys.argv.pop(1)
+    if not opcode in opcodes:
+        print "INVALID OPERATION: USE --name or --remove"
 
-if opcode == '--name':
-    vlan_name=sys.argv.pop(1)
-    vlan_num=sys.argv.pop(1)
-elif opcode == '--remove':
-    vlan_num = sys.argv.pop(1)
-vlan_string = "vlan %s" %vlan_num
+    if opcode == '--name':
+        vlan_num=sys.argv.pop(1)
+        vlan_name=sys.argv.pop(1)
+    elif opcode == '--remove':
+        vlan_num = sys.argv.pop(1)
+        vlan_name = None
+    vlan_string = "vlan %s" %vlan_num
+    name_string = "name %s" %vlan_name
 
 
-ssl._create_default_https_context = ssl._create_unverified_context
+    ssl._create_default_https_context = ssl._create_unverified_context
 
-ip = '184.105.247.75'
-port = '443'
-username = 'eapi'
-password = '17mendel'
-switch_url = 'https://{}:{}@{}:{}/command-api'.format(username,password,ip,port)
-
-remote_connect = jsonrpclib.Server(switch_url)
-response = remote_connect.runCmds(1,[{'cmd': 'enable', 'input': ''}, 'show running-config'])
-config = response[1]['cmds']
-is_configured = re_in_list(vlan_string, config)
-
-if opcode == '--name':
-    if is_configured:
-        vlan_config = config[vlan_string]['cmds']
-        name = " ".join(re_in_list('name',vlan_config).split()[1:])
-        print "vlan %s IS CONFIGURED" %vlan_num
-        print "  NAME IS %s" %name
-        if name != vlan_name:
-            print "    BUT NAME IS INCORRECT"
-            #Configure vlan name
-            commands = []
-            commands.append({'cmd': 'enable', 'input': ''})
-            commands.extend(['configure terminal', 'vlan %s' %vlan_num, 'name %s' %vlan_name])
-            remote_connect.runCmds(1,commands)
+    remote_connect=pyeapi.connect_to("pynet-sw4")
+    response=remote_connect.enable("show running-config")
+    config=response[0]['result']['cmds']
+    if vlan_string in config.keys():
+        is_configured = True
+        vlan_config = config[vlan_string]
     else:
-        print "vlan %s IS NOT CONFIGURED" %vlan_num
-        commands = []
-        commands.append({'cmd': 'enable', 'input': ''})
-        commands.extend(['configure terminal', 'vlan %s' %vlan_num, 'name %s' %vlan_name])
-        remote_connect.runCmds(1,commands)
-        print "vlan %s CONFIGURED"
+        is_configured = False
 
-elif opcode=='--remove':
-     if is_configured:
-         commands = []
-         commands.append({'cmd': 'enable', 'input': ''})
-         commands.extend(['configure terminal', 'no vlan %s' %vlan_num])
-         remote_connect.runCmds(1,commands)
-         print "vlan %s REMOVED" %vlan_num
-     else:
-         print "vlan %s IS NOT CONFIGURED" %vlan_num
+    if opcode == '--name':
+        if is_configured:
+            print "vlan %s IS CONFIGURED" %vlan_num
+            print "  NAME IS %s" %name_string
+            if not name_string in vlan_config.keys():
+                print "    BUT NAME IS INCORRECT"
+                print "RECONFIGURE VLAN NAME"
+                commands = [vlan_string,name_string]
+                print "COMMANDS=%s" %commands
+                remote_connect.config(commands)
+        else:
+            print "vlan %s IS NOT CONFIGURED" %vlan_num
+            commands = [vlan_string,name_string]
+            print "COMMANDS=%s" %commands
+            remote_connect.config(commands)
+            print "vlan %s CONFIGURED" %vlan_num
+
+    elif opcode=='--remove':
+        if is_configured:
+             commands = ['no %s' %vlan_string]
+             remote_connect.config(commands)
+             print "vlan %s REMOVED" %vlan_num
+        else:
+            print "vlan %s IS NOT CONFIGURED" %vlan_num
+
+if __name__ == "__main__":
+    main()
