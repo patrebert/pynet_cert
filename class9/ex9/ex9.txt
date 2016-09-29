@@ -1,0 +1,20 @@
+(applied_python)[prebert@ip-172-30-0-4 ex9]$ echo $PYTHONPATH
+/home/prebert/repos/pynet_cert/class9/different_directory/
+(applied_python)[prebert@ip-172-30-0-4 ex9]$ python
+Python 2.7.12 (default, Sep  1 2016, 22:14:00) 
+[GCC 4.8.3 20140911 (Red Hat 4.8.3-9)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from mytest import *
+>>> dir()
+['MyClass', '__builtins__', '__doc__', '__name__', '__package__', 'func1', 'func2', 'func3', 'testclass']
+>>> func1()
+simple.py func1
+>>> func2()
+whatever.py func2
+>>> func3()
+world.py func3
+>>> my_obj = MyClass('a', 'b', 'c')
+>>> my_obj.hello()
+hello
+  a b c
+
