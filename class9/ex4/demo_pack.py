@@ -1,0 +1,2 @@
+from mytest import *
+testclass()
